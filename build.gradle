@@ -1,0 +1,62 @@
+defaultTasks 'clean', 'test', 'aggregate'
+
+apply plugin: 'java'
+apply plugin: 'net.serenity-bdd.aggregator'
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+buildscript {
+    project.ext {
+        serenityVersion = '2.3.12'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath('net.serenity-bdd:serenity-gradle-plugin:' + serenityVersion)
+        classpath('net.serenity-bdd:serenity-single-page-report:' + serenityVersion)
+    }
+}
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+ext {
+    serenityCoreVersion = '3.3.7'
+    junitVersion = '4.13'
+    assertJVersion = '3.8.0'
+    cucumberVersion = '7.8.1'
+}
+
+dependencies {
+    testImplementation "net.serenity-bdd:serenity-core:${serenityCoreVersion}",
+            "net.serenity-bdd:serenity-junit:${serenityCoreVersion}",
+            "net.serenity-bdd:serenity-screenplay:${serenityCoreVersion}",
+            "net.serenity-bdd:serenity-cucumber:${serenityCoreVersion}",
+            "junit:junit:${junitVersion}",
+            "io.appium:java-client:8.1.1",
+            "org.assertj:assertj-core:${assertJVersion}",
+            "io.cucumber:cucumber-java:${cucumberVersion}",
+            "io.cucumber:cucumber-junit:${cucumberVersion}"
+}
+
+serenity {
+    reports = ["single-page-html"]
+}
+
+test {
+    ignoreFailures = true
+//     filter {
+//         includeTestsMatching "*.runner.*"
+//     }
+    testLogging.showStandardStreams = true
+    systemProperties System.getProperties()
+
+}
+gradle.startParameter.continueOnFailure = true
+
+test.finalizedBy(aggregate)
